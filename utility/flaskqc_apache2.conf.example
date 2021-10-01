@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+    WSGIDaemonProcess Pone processes=2 threads=15
+    #WSGIProcessGroup Gone
+
+    #WSGIDaemonProcess helloo 
+
+    WSGIScriptAlias /helloo /usr/share/nchs/helloo/index.wsgi
+    <Directory /usr/share/nchs/helloo>
+        WSGIProcessGroup Pone
+        WSGIScriptReloading On
+        #WSGIApplicationGroup %{GLOBAL}
+	Require all granted 
+    </Directory>
+
+    #WSGIDaemonProcess hellooo
+    WSGIScriptAlias /hellooo /usr/share/nchs/helloo/index.wsgi
+    <Directory /usr/share/nchs/helloo>
+        WSGIProcessGroup Pone
+        #WSGIApplicationGroup %{GLOBAL}
+        Require all granted
+    </Directory>
+</VirtualHost>
