@@ -4,6 +4,9 @@ import logging
 import MySQLdb 
 app = Flask(__name__)
 
+from werkzeug.debug import DebuggedApplication
+application = DebuggedApplication(app, True)
+
 
 class my_sql(object):
   def get_link(self,my_host,my_user,my_pass,my_db):
@@ -37,7 +40,32 @@ class my_sql(object):
 @app.route('/')
 def helloo():
   m=my_sql()
-  m.get_link("127.0.0.1","rootuser","rootuser","cl_general")
+  m.get_link("127.0.0.1","main_user","main_pass","cl_general")
   m.run_query("select * from examination",())
   m.get_single_row()
-  return 'Data {}'.format(m.data)
+  return ' First Data:{}'.format(m.data)
+
+
+@app.route('/all')
+def helloo_all():
+  m=my_sql()
+  m.get_link("127.0.0.1","main_user","main_pass","cl_general")
+  m.run_query("select * from examination limit 30",())
+  m.get_single_row()
+  all_data=()
+  while(m.data):
+    all_data=all_data+(m.data,)
+    m.get_single_row()  
+  return 'All Data {}'.format(all_data)
+
+@app.route('/<examination_id>')
+def helloo_specific(examination_id):
+  m=my_sql()
+  m.get_link("127.0.0.1","main_user","main_pass","cl_general")
+  m.run_query("select * from examination where examination_id=%s",(examination_id,))
+  m.get_single_row()
+  all_data=()
+  while(m.data):
+    all_data=all_data+(m.data,)
+    m.get_single_row()  
+  return 'Examination ID={}: Data {}'.format(examination_id,all_data)
