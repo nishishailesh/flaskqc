@@ -1,0 +1,18 @@
+<!doctype html>
+<title>Examinations Found</title>
+{% if all_data %}
+  {# {{all_data}} This is a comment #}
+  <table border=1>
+	<tr><th>sample_id</th><th>examination_id</th><th>result</th><th>recording_time</th><th>recorded_by</th></tr>
+  {% for item in all_data %}
+     <tr>
+		{% for col in item %}
+		<td>{{col}}</td>
+		{% endfor %}      
+     </tr>
+  {% endfor %}
+  </table>
+{% else %}
+  <h1>Nothing Found</h1>
+{% endif %}
+
