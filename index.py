@@ -44,6 +44,9 @@ class my_sql(object):
 
   def close_link(self):
     self.con.close()
+  def get_fields(self):
+    print(self.cur.description)
+    return self.cur.description
 
 '''
 @app.route('/')
@@ -64,40 +67,72 @@ def helloo():
 app.route('/')(helloo)
 '''
 
+
+database="food"
+table="food"
+pk="FoodCode"
+
+
+'''
+database="cl_general"
+table="examination"
+pk="examination_id"
+'''
+
+
+def verify_login():
+  def doit():
+    if(post_data['login']=='apple'):
+      post_result='success'
+    else:
+      post_result='failure'
+    return True
+  return doit
+
+
+
+
+
 @app.route('/')
 def login():
   return render_template('login.html')
 
 @app.route('/home',methods=['GET', 'POST'])
+@verify_login()
 def home_page():
   data = request.form
-  return render_template('home.html',data=data)
+  return render_template('home.html',data=(data,'dummy'))
+
   
 @app.route('/all')
 def helloo_all():
+  global database,table
   m=my_sql()
   #m.get_link("127.0.0.1","main_user","main_pass","cl_general")
-  m.get_link("127.0.0.1","rootuser","rootuser","cl_general")
-  m.run_query("select * from result limit 30",())
+  m.get_link("127.0.0.1","rootuser","rootuser",database)
+  m.run_query("select * from "+table+" limit 30",())
   m.get_single_row()
+  fields=m.get_fields()
   all_data=()
   while(m.data):
     all_data=all_data+(m.data,)
     m.get_single_row()  
   #return 'All Data {}'.format(all_data)
-  return render_template('show_result.html',all_data=all_data)
+  return render_template('show_result.html',all_data=(all_data,fields,database,table))
 
 
-@app.route('/<int:sample_id>',methods=['GET', 'POST'])
-def helloo_specific(sample_id):
+@app.route('/<pk_id>',methods=['GET', 'POST'])
+def helloo_specific(pk_id):
+  global database,table,pk
   m=my_sql()
   #m.get_link("127.0.0.1","main_user","main_pass","cl_general")
-  m.get_link("127.0.0.1","rootuser","rootuser","cl_general")
-  m.run_query("select * from result where sample_id=%s",(sample_id,))
+  m.get_link("127.0.0.1","rootuser","rootuser",database)
+  m.run_query("select * from "+table+"  where "+pk+"=%s",(pk_id,))
+  fields=m.get_fields()
   m.get_single_row()
   all_data=()
   while(m.data):
     all_data=all_data+(m.data,)
     m.get_single_row()  
   #return 'Examination IDDDD={}: Data {}'.format(examination_id,all_data)
-  return render_template('show_result.html',all_data=all_data)
+  return render_template('show_result.html',all_data=(all_data,fields,database,table))
